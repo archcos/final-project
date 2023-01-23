@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:finalproject/screen/display_comments.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 Future<CommentModel> addComment(int? commentId, int? postId, String comment, String alias, String createdAt) async {
   final response = await http.post(
@@ -75,6 +79,9 @@ class _CommentsState extends State<Comments> {
   final TextEditingController aliasController = TextEditingController();
 
   var formKey = GlobalKey<FormState>();
+
+  File? file;
+  ImagePicker image = ImagePicker();
 
   List post = <dynamic>[];
   List comments = <dynamic>[];
@@ -150,6 +157,61 @@ class _CommentsState extends State<Comments> {
                 decoration: InputDecoration(
                   labelText: "Comment Here",
                   hintText: "Input you comment here",
+                  suffixIcon: IconButton(
+                    onPressed: (){
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text("Please choose"),
+                          content: const Text("From:"),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () async {
+                                // getCam();
+                                PermissionStatus cameraStatus = await Permission.camera.request();
+                                if (cameraStatus == PermissionStatus.granted) {
+                                  getCam(ImageSource.camera);
+                                } else if (cameraStatus == PermissionStatus.denied) {
+                                  return ;
+                                }
+
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(5),
+                                child: const Text("Camera"),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                // getGall();
+                                PermissionStatus cameraStatus = await Permission.storage.request();
+                                if (cameraStatus == PermissionStatus.granted) {
+                                  getGall(ImageSource.gallery);
+                                } else if (cameraStatus == PermissionStatus.denied) {
+                                  return;
+                                }
+
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(5),
+                                child: const Text("Gallery"),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(ctx).pop();
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(5),
+                                child: const Text("Cancel"),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.image),
+                  ),
                   contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
                 ),
@@ -191,5 +253,20 @@ class _CommentsState extends State<Comments> {
           )
       ),
     );
+  }
+  getCam(ImageSource source) async {
+    // ignore: deprecated_member_use
+    var img = await image.getImage(source: ImageSource.camera);
+    setState(() {
+      file = File(img!.path);
+    });
+  }
+
+  getGall(ImageSource source) async {
+    // ignore: deprecated_member_use
+    var img = await image.getImage(source: ImageSource.gallery);
+    setState(() {
+      file = File(img!.path);
+    });
   }
 }
