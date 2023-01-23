@@ -135,6 +135,50 @@ class _HomePageState extends State<HomePage> {
                           '${posts[index]['message']}'
                         ),
                       ),
+                      const SizedBox(
+                        height: 5.0,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: <Widget> [
+                          TextButton.icon(
+                            onPressed: (){},
+                              icon: const Icon(
+                                Icons.thumb_up_outlined,
+                                color: Colors.white,
+                              ),
+                              label: const Text(
+                                "Like",
+                                style: TextStyle(
+                                    color: Colors.white
+                                ),
+                              ),
+                          ),
+                          Row(
+                            children: [
+                              TextButton.icon(
+                                  onPressed: (){
+                                    postId = int.parse(posts[index]['postId']);
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => Comments(data: int.parse(posts[index]['postId'])))
+                                    );
+                                  },
+                                  icon: const Icon(
+                                      Icons.comment_outlined,
+                                    color: Colors.white,
+                                  ),
+                                label: const Text(
+                                    "Comment",
+                                  style: TextStyle(
+                                      color: Colors.white
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                       const Divider(
                         height: 10,
                         thickness: 2,
@@ -143,13 +187,13 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ],
                   ),
-                  onTap: () {
-                      postId = int.parse(posts[index]['postId']);
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => Comments(data: int.parse(posts[index]['postId'])))
-                      );
-                  },
+                  // onTap: () {
+                  //     postId = int.parse(posts[index]['postId']);
+                  //     Navigator.push(
+                  //         context,
+                  //         MaterialPageRoute(builder: (context) => Comments(data: int.parse(posts[index]['postId'])))
+                  //     );
+                  // },
                 ),
               );
             },
