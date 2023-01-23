@@ -2,6 +2,7 @@ import 'package:finalproject/csidebar/collapsible_sidebar.dart';
 import 'package:finalproject/screen/create_post.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert' as convert;
 
 import 'add_comments.dart';
@@ -25,16 +26,25 @@ class _HomePageState extends State<HomePage> {
   int postId = 0;
   int currentIndex = 0;
   List account = <dynamic>[];
-
+  String token = "";
   @override
   void initState() {
     getPosts();
     // getUser();
     getUsers();
     super.initState();
+    getCred();
   }
 
 
+  void getCred() async{
+    //HERE WE FETCH OUR CREDENTIALS FROM SHARED PREFERENCES
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      token = pref.getString("login")!;
+    });
+
+  }
 
   getUsers() async {
     var url = 'https://63c95a0e320a0c4c9546afb1.mockapi.io/api/users';
@@ -70,6 +80,7 @@ class _HomePageState extends State<HomePage> {
   @override void dispose(){
     super.dispose();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +143,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       ListTile(
                         title: Text(
-                          '${posts[index]['message']}'
+                            '${posts[index]['message']}'
                         ),
                       ),
                       const Divider(
@@ -144,11 +155,11 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                   onTap: () {
-                      postId = int.parse(posts[index]['postId']);
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => Comments(data: int.parse(posts[index]['postId'])))
-                      );
+                    postId = int.parse(posts[index]['postId']);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Comments(data: int.parse(posts[index]['postId'])))
+                    );
                   },
                 ),
               );
