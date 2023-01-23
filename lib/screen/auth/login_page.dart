@@ -46,8 +46,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
 
-  late SharedPreferences logindata;
-  late bool newuser;
+ 
   List accounts = <dynamic>[];
   List account = <dynamic>[];
   var formKey = GlobalKey<FormState>();
@@ -63,7 +62,10 @@ class _LoginPageState extends State<LoginPage> {
     db.initDB();
     checkPermission();
     getUsers();
+    checkLogin();
   }
+
+
 
   checkPermission() async {
     Map<Permission, PermissionStatus> statuses = await [
@@ -78,43 +80,40 @@ class _LoginPageState extends State<LoginPage> {
     var url = 'https://63c95a0e320a0c4c9546afb1.mockapi.io/api/users';
     var response = await http.get(Uri.parse(url));
 
-    setState( () {
+    setState(() {
       accounts = convert.jsonDecode(response.body) as List<dynamic>;
     }
     );
   }
 
   Future loginData() async {
-    
-
     var username = userNameController.text;
     var password = passwordController.text;
     showDialog(
         context: context,
-        builder: (context){
+        builder: (context) {
           return const Center(
               child: CircularProgressIndicator()
           );
         });
     Navigator.of(context).pop();
 
-      for (var i = 0; i <= accounts.length; i++) {
-        if (username == accounts[i]['username'] &&
-            password == accounts[i]['password']) {
-          _showMsg('Login Success');
-          account.add(accounts[i]);
-          await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => HomePage(data: account))
-          );
+    for (var i = 0; i <= accounts.length; i++) {
+      if (username == accounts[i]['username'] &&
+          password == accounts[i]['password']) {
+        _showMsg('Login Success');
+        account.add(accounts[i]);
+        await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage(data: account))
+        );
 
 
-
-          break;
-        }
+        break;
+      }
     }
-
   }
+
   _showMsg(msg) {
     final snackBar = SnackBar(
         content: Text(msg),
@@ -133,6 +132,17 @@ class _LoginPageState extends State<LoginPage> {
     passwordController.dispose();
     super.dispose();
   }
+  void checkLogin () async {
+    //HERE WE CHECK IF USER ALREADY LOGIN OR CREDENTIAL ALREADY AVAILABLE OR NOT
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String? val = pref.getString("login");
+    if (val != null) {
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => HomePage(data: [],)),
+              (route) => false);
+
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -142,20 +152,25 @@ class _LoginPageState extends State<LoginPage> {
                 padding: const EdgeInsets.all(30),
                 children: [
                   const Image(image: AssetImage("assets/logo.png"),
-                  width: 300,
-                  height: 300),
-                  const Text("ANONYMITY", style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                      width: 300,
+                      height: 300),
+                  const Text("ANONYMITY", style: TextStyle(fontSize: 20,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center),
                   const SizedBox(height: 50),
                   TextFormField(
                     controller: userNameController,
                     keyboardType: TextInputType.name,
                     decoration: InputDecoration(
-                        labelText: "Username",
-                        contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+                      labelText: "Username",
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 10.0, horizontal: 10.0),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5.0)),
                     ),
-                    validator: (value){
-                      return (value == '')? "Input Name" : null;
+                    validator: (value) {
+                      return (value == '') ? "Input Name" : null;
                     },
                   ),
                   const SizedBox(height: 10),
@@ -166,22 +181,26 @@ class _LoginPageState extends State<LoginPage> {
                       decoration: InputDecoration(
                         labelText: 'Password',
                         hintText: 'Enter your password',
-                        contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 10.0),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5.0)),
                       )
                   ),
                   const SizedBox(height: 10),
                   ElevatedButton(
                       onPressed: () {
                         loginData();
+                        login();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.greenAccent
+                          backgroundColor: Colors.greenAccent
                       ),
-                      child: const Text("Sign In", style: TextStyle(color: Colors.black, fontSize: 17))
+                      child: const Text("Sign In",
+                          style: TextStyle(color: Colors.black, fontSize: 17))
                   ),
                   TextButton(
-                      onPressed: (){
+                      onPressed: () {
                         showMyDialogue();
                       },
                       child: const Text("Create Account")
@@ -191,6 +210,41 @@ class _LoginPageState extends State<LoginPage> {
         )
     );
   }
+
+  void login() async {
+    if (passwordController.text.isNotEmpty && emailController.text.isNotEmpty) {
+      var response = await http.post(
+          Uri.parse("https://63c95a0e320a0c4c9546afb1.mockapi.io/api/login"),
+          body: ({
+            "email": emailController.text,
+            "password": passwordController.text
+          }));
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+        //print("Login Token" + body.["token"]);
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Token : ${body['token']}")));
+
+        pageRoute(body['token']);
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Invalid Credentials")));
+      }
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Blank Value Found")));
+    }
+  }
+    void pageRoute(String token) async {
+      //HERE WE STORE VALUE OR TOKEN INSIDE SHARED PREFERENCES
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      await pref.setString("login", token);
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => HomePage(data: [],)),
+              (route) => false);
+    }
+
+
 
   void showMyDialogue() async {
     return showDialog(
@@ -262,33 +316,33 @@ class _LoginPageState extends State<LoginPage> {
             actions: [
               TextButton(
                 onPressed: () {
-                   if (formKey.currentState!.validate()) {
-                     Navigator.pop(context);
-                     currentIndex = accounts.lastIndexOf('id', 0);
-                     DataModel dataLocal = DataModel(
-                       firstname: firstNameController.text,
-                       lastname: lastNameController.text,
-                       username: userNameController.text,
-                       password: passwordController.text,
-                       email: emailController.text,
-                     );
-                     db.insertData(dataLocal);
-                     setState(() {
-                       postAccount(
-                           currentIndex,
-                           firstNameController.text,
-                           lastNameController.text,
-                           userNameController.text,
-                           passwordController.text,
-                           emailController.text
-                       );
-                     });
-                     firstNameController.clear();
-                     lastNameController.clear();
-                     userNameController.clear();
-                     passwordController.clear();
-                     emailController.clear();
-                   }
+                  if (formKey.currentState!.validate()) {
+                    Navigator.pop(context);
+                    currentIndex = accounts.lastIndexOf('id', 0);
+                    DataModel dataLocal = DataModel(
+                      firstname: firstNameController.text,
+                      lastname: lastNameController.text,
+                      username: userNameController.text,
+                      password: passwordController.text,
+                      email: emailController.text,
+                    );
+                    db.insertData(dataLocal);
+                    setState(() {
+                      postAccount(
+                          currentIndex,
+                          firstNameController.text,
+                          lastNameController.text,
+                          userNameController.text,
+                          passwordController.text,
+                          emailController.text
+                      );
+                    });
+                    firstNameController.clear();
+                    lastNameController.clear();
+                    userNameController.clear();
+                    passwordController.clear();
+                    emailController.clear();
+                  }
                 },
                 child: const Center(
                   child: Text("Sign Up"),
@@ -298,4 +352,5 @@ class _LoginPageState extends State<LoginPage> {
           );
         });
   }
+
 }
