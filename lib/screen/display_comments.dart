@@ -17,24 +17,15 @@ class DisplayComments extends StatefulWidget {
 class _DisplayCommentsState extends State<DisplayComments> {
 
   List comments = <dynamic>[];
-  late List postComment = <dynamic>[];
+  List postComment = <dynamic>[];
   int currentIndex = 0;
 
   @override
   void initState() {
-    getComments();
     displayComments();
+    postComment;
     super.initState();
   }
-
-  getComments() async {
-    var url = 'https://63cb9d8cea85515415128b2b.mockapi.io/api/comments';
-    var response = await http.get(Uri.parse(url));
-
-    setState( () {
-      comments = convert.jsonDecode(response.body) as List<dynamic>;
-    });
-    }
 
   displayComments() async {
     postComment = widget.data;
@@ -49,11 +40,41 @@ class _DisplayCommentsState extends State<DisplayComments> {
       body: ListView.builder(
           itemCount: postComment.length,
           itemBuilder: (context, index){
-            return ListTile(
-              title: Text("${postComment[index]['commentId']}"),
-              onTap: (){
-                Navigator.pop(context);
-              },
+            return Column(
+              children: <Widget>[
+                ListTile(
+                  leading: CircleAvatar(
+                    child: Image.network(
+                      "${postComment[index]['avatar']}",
+                    ),
+                  ),
+                  contentPadding: const EdgeInsets.all(0),
+                  title: Text(
+                    "${postComment[index]['alias']}",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  trailing: Text(
+                    "${postComment[index]['createdAt']}",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w300,
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+                ListTile(
+                  title: Text(
+                      '${postComment[index]['comment']}'
+                  ),
+                ),
+                const Divider(
+                  height: 10,
+                  thickness: 2,
+                  indent: 5,
+                  endIndent: 5,
+                ),
+              ],
             );
           }
           ),

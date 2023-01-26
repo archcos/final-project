@@ -93,8 +93,6 @@ class _CommentsState extends State<Comments> {
   @override
   void initState() {
     getPost();
-    getComments();
-    postComments;
     super.initState();
   }
 
@@ -108,23 +106,19 @@ class _CommentsState extends State<Comments> {
     );
   }
 
-  displayComments() async {
-    for(var i = 0; i <= comments.length; i++){
-      currentIndex = widget.data;
-      if (widget.data == comments[i]['postId']){
-        setState(() {
-          postComments.add(comments[i]);
-        });
-      }
-    }
-  }
 
-  getComments() async {
+
+  getComments(int data) async {
     var url = 'https://63cb9d8cea85515415128b2b.mockapi.io/api/comments';
     var response = await http.get(Uri.parse(url));
 
     setState( () {
       comments = convert.jsonDecode(response.body) as List<dynamic>;
+      for(int i = 0; i <= comments.length; i++){
+        if(data == comments[i]['postId']){
+          postComments.add(comments[i]);
+        }
+      }
     }
     );
   }
@@ -240,7 +234,7 @@ class _CommentsState extends State<Comments> {
               TextButton(
                   onPressed: () {
                     setState(() {
-                      // displayComments();
+                      getComments(widget.data);
                     });
                      Navigator.push(
                         context,

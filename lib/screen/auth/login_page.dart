@@ -1,4 +1,3 @@
-import 'package:finalproject/csidebar/collapsible_sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:finalproject/util/data_model.dart';
 import 'package:finalproject/util/database.dart';
@@ -8,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:convert' as convert;
+import 'package:themed/themed.dart';
 
 Future<DataModel> postAccount(int? id, String firstname, String lastname, String username, String password, String email) async {
   final response = await http.post(
@@ -141,9 +141,14 @@ class _LoginPageState extends State<LoginPage> {
             child: ListView(
                 padding: const EdgeInsets.all(30),
                 children: [
-                  const Image(image: AssetImage("assets/logo.png"),
-                  width: 300,
-                  height: 300),
+                ChangeColors(
+                    hue: 0.55,
+                    brightness: 0.2,
+                    saturation: 0.1,
+                  child: Image.asset("assets/logo.png",
+                      width: 300,
+                      height: 300)
+                  ),
                   const Text("ANONYMITY", style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
                   const SizedBox(height: 50),
                   TextFormField(
