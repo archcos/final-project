@@ -40,30 +40,31 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
 
-  final TextEditingController userNameController = TextEditingController();
+  late TextEditingController userNameController = TextEditingController(text: displayUser);
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
 
-  late SharedPreferences logindata;
-  late bool newuser;
   List accounts = <dynamic>[];
   List account = <dynamic>[];
   var formKey = GlobalKey<FormState>();
   List<DataModel> data = [];
-  bool fetching = true;
   late int currentIndex;
   late DB db;
+  late String? displayUser;
+
 
   @override
   void initState() {
-    super.initState();
     db = DB();
     db.initDB();
     checkPermission();
     getUsers();
+    getUsername();
+    super.initState();
   }
+
 
   checkPermission() async {
     Map<Permission, PermissionStatus> statuses = await [
@@ -107,9 +108,6 @@ class _LoginPageState extends State<LoginPage> {
               context,
               MaterialPageRoute(builder: (context) => HomePage(data: account))
           );
-
-
-
           break;
         }
     }
@@ -123,6 +121,14 @@ class _LoginPageState extends State<LoginPage> {
           onPressed: () {},
         ));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  getUsername() async{
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      displayUser = pref.getString('displayUser')!;
+      print('check $displayUser');
+    });
   }
 
 

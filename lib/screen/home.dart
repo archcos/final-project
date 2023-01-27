@@ -2,6 +2,7 @@ import 'package:finalproject/csidebar/collapsible_sidebar.dart';
 import 'package:finalproject/screen/create_post.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert' as convert;
 
 import 'add_comments.dart';
@@ -31,7 +32,14 @@ class _HomePageState extends State<HomePage> {
     getPosts();
     // getUser();
     getUsers();
+    setUser();
     super.initState();
+  }
+
+  setUser() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setString("displayUser", widget.data[0]['username']);
+    print(widget.data[0]['username']);
   }
 
 
