@@ -1,9 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
-import 'package:async/async.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -28,7 +26,6 @@ class _ImageUploadState extends State<ImageUpload> {
       setState(() {
         _image = File(pickedImage.path);
       });
-      print(pickedImage);
     }
   }
 
@@ -37,7 +34,7 @@ class _ImageUploadState extends State<ImageUpload> {
     request.fields["image"] = _image.toString();
     request.files.add(http.MultipartFile.fromBytes("picture", File(_image!.path).readAsBytesSync(),filename: _image!.path));
     var res = await request.send();
-    print(_image.toString());
+    throw res;
   }
 
 
@@ -45,61 +42,53 @@ class _ImageUploadState extends State<ImageUpload> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Kindacode.com'),
+          title: const Text('Image Upload'),
         ),
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(35),
-            child: Column(children: [
-              Center(
-                child: ElevatedButton(
-                  child: const Text('Select An Image'),
-                  onPressed: _openImagePicker,
-                ),
-              ),
-              const SizedBox(height: 35),
-              Container(
-                alignment: Alignment.center,
-                width: double.infinity,
-                height: 300,
-                color: Colors.grey[300],
-                child: _image != null
-                    ? Image.file(_image!, fit: BoxFit.cover)
-                    : const Text('Please select an image'),
-              ),ElevatedButton(onPressed: (){
-                uploadImage(_image!);
-              }, child: const Text("Upload"))
-            ]),
+            child: Column(
+                children: [
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: _openImagePicker,
+                      child: const Text('Select An Image'),
+                    ),
+                  ),
+                  const SizedBox(height: 35),
+                  Container(
+                    alignment: Alignment.center,
+                    width: double.infinity,
+                    height: 300,
+                    color: Colors.grey[300],
+                    child: _image != null
+                        ? Image.file(_image!, fit: BoxFit.cover)
+                        : const Text('Please select an image'),
+                  ),
+                  ElevatedButton(
+                      onPressed: (){
+                        uploadImage(_image!);
+                      },
+                      child: const Text("Upload")
+                  )
+              ]
+            ),
           ),
-        ));
+        )
+    );
   }
 
   upload(File imageFile) async {
-    // open a bytestream
     var stream = http.ByteStream(Stream.castFrom(imageFile.openRead()));
-    // get file length
     var length = await imageFile.length();
-
-    // string to uri
     var uri = Uri.parse("https://63c95a0e320a0c4c9546afb1.mockapi.io/api/image_share");
-
-    // create multipart request
     var request = http.MultipartRequest("POST", uri);
-
-    // multipart that takes file
     var multipartFile = http.MultipartFile('file', stream, length,
         filename: basename(imageFile.path));
-
-    // add file to multipart
     request.files.add(multipartFile);
-
-    // send
     var response = await request.send();
-    print(response.statusCode);
-
-    // listen for response
     response.stream.transform(utf8.decoder).listen((value) {
-      print(value);
-    });
+      }
+    );
   }
 }

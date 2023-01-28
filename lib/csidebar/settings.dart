@@ -24,7 +24,6 @@ Future<DataModel> updateAccount(int id, String firstname, String lastname, Strin
   );
 
   if (response.statusCode == 200) {
-    //print(response.statusCode); //to check if updated successfully
     return DataModel.fromJson(jsonDecode(response.body));
   } else {
     throw Exception(response.statusCode);
@@ -50,13 +49,12 @@ class _SettingsState extends State<Settings> {
   final TextEditingController emailController = TextEditingController();
 
   List<DataModel> data = [];
-  bool fetching = false;
   int currentIndex = 0;
   var formKey = GlobalKey<FormState>();
   List users = <dynamic>[];
   int idNum = 0;
-
   late DB db;
+
   @override
   void initState() {
     super.initState();

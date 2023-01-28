@@ -44,7 +44,6 @@ class PostModel {
     "createdAt": createdAt
   };
 
-
   factory PostModel.fromJson(Map<dynamic, dynamic> json) {
     return PostModel(
       postId: json['postId'],
@@ -76,8 +75,8 @@ class _CreatePostState extends State<CreatePost> {
 
   @override
   void initState() {
-    super.initState();
     getPosts();
+    super.initState();
   }
 
   getPosts() async {

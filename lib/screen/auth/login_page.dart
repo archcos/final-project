@@ -40,7 +40,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
 
-  late TextEditingController userNameController = TextEditingController(text: displayUser);
+  final TextEditingController userNameController = TextEditingController();
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -52,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
   List<DataModel> data = [];
   late int currentIndex;
   late DB db;
-  late String? displayUser;
+  String? displayUser;
 
 
   @override
@@ -86,18 +86,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future loginData() async {
-    
-
     var username = userNameController.text;
     var password = passwordController.text;
-    showDialog(
-        context: context,
-        builder: (context){
-          return const Center(
-              child: CircularProgressIndicator()
-          );
-        });
-    Navigator.of(context).pop();
 
       for (var i = 0; i <= accounts.length; i++) {
         if (username == accounts[i]['username'] &&
@@ -119,7 +109,8 @@ class _LoginPageState extends State<LoginPage> {
         action: SnackBarAction(
           label: 'Close',
           onPressed: () {},
-        ));
+        )
+    );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -127,7 +118,6 @@ class _LoginPageState extends State<LoginPage> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
       displayUser = pref.getString('displayUser')!;
-      print('check $displayUser');
     });
   }
 
@@ -139,6 +129,7 @@ class _LoginPageState extends State<LoginPage> {
     passwordController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -156,7 +147,9 @@ class _LoginPageState extends State<LoginPage> {
                       height: 300)
                   ),
                   const Text("ANONYMITY", style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                  const SizedBox(height: 50),
+                  const SizedBox(height: 25),
+                  Text("Welcome $displayUser !", style: const TextStyle(fontSize: 15, color: Colors.white, fontStyle: FontStyle.italic), textAlign: TextAlign.center),
+                  const SizedBox(height: 20),
                   TextFormField(
                     controller: userNameController,
                     keyboardType: TextInputType.name,
@@ -275,7 +268,7 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: () {
                    if (formKey.currentState!.validate()) {
                      Navigator.pop(context);
-                     currentIndex = accounts.lastIndexOf('id', 0);
+                     currentIndex = accounts.indexOf('id', 0);
                      DataModel dataLocal = DataModel(
                        firstname: firstNameController.text,
                        lastname: lastNameController.text,
@@ -284,6 +277,7 @@ class _LoginPageState extends State<LoginPage> {
                        email: emailController.text,
                      );
                      db.insertData(dataLocal);
+                     print(db);
                      setState(() {
                        postAccount(
                            currentIndex,
@@ -307,6 +301,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ],
           );
-        });
+        }
+      );
   }
 }

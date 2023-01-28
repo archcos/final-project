@@ -4,11 +4,11 @@ class ContactUs extends StatefulWidget {
   const ContactUs({Key? key}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
-  _ContactUsState createState() => _ContactUsState();
+  State<ContactUs> createState() => _ContactUsState();
 }
 
 class _ContactUsState extends State<ContactUs> {
+
   List contacts = [
     {'name': "Jeremiah Larry King Ungsod", 'email': 'j.ungsod019@gmail.com'},
     {'name': "Arjay Audiencia Charcos", 'email': 'rain.shigatsu@gmail.com'},

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert' as convert;
-
 import 'add_comments.dart';
 
 class HomePage extends StatefulWidget {
@@ -30,7 +29,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     getPosts();
-    // getUser();
     getUsers();
     setUser();
     super.initState();
@@ -39,7 +37,6 @@ class _HomePageState extends State<HomePage> {
   setUser() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setString("displayUser", widget.data[0]['username']);
-    print(widget.data[0]['username']);
   }
 
 
@@ -48,10 +45,9 @@ class _HomePageState extends State<HomePage> {
     var url = 'https://63c95a0e320a0c4c9546afb1.mockapi.io/api/users';
     var response = await http.get(Uri.parse(url));
 
-    setState( () {
+    setState(() {
       users = convert.jsonDecode(response.body) as List<dynamic>;
-    }
-    );
+    });
   }
 
   getUser() async {
@@ -69,14 +65,9 @@ class _HomePageState extends State<HomePage> {
     var url = 'https://63cb9d8cea85515415128b2b.mockapi.io/api/posts';
     var response = await http.get(Uri.parse(url));
 
-    setState( () {
+    setState(() {
       posts = convert.jsonDecode(response.body) as List<dynamic>;
-    }
-    );
-  }
-
-  @override void dispose(){
-    super.dispose();
+    });
   }
 
   @override
@@ -195,13 +186,6 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ],
                   ),
-                  // onTap: () {
-                  //     postId = int.parse(posts[index]['postId']);
-                  //     Navigator.push(
-                  //         context,
-                  //         MaterialPageRoute(builder: (context) => Comments(data: int.parse(posts[index]['postId'])))
-                  //     );
-                  // },
                 ),
               );
             },

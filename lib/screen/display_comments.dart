@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert' as convert;
-
 
 class DisplayComments extends StatefulWidget {
 
@@ -16,7 +13,6 @@ class DisplayComments extends StatefulWidget {
 
 class _DisplayCommentsState extends State<DisplayComments> {
 
-  List comments = <dynamic>[];
   List postComment = <dynamic>[];
   int currentIndex = 0;
 
@@ -77,7 +73,7 @@ class _DisplayCommentsState extends State<DisplayComments> {
               ],
             );
           }
-          ),
+       ),
     );
   }
 }

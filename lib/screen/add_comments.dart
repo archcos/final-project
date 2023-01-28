@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:finalproject/screen/display_comments.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -21,7 +20,8 @@ Future<CommentModel> addComment(int? commentId, int? postId, String comment, Str
       "comment": comment,
       "alias": alias,
       "createdAt": createdAt
-    }),
+      }
+    ),
   );
 
   if (response.statusCode == 201) {
@@ -75,11 +75,11 @@ class Comments extends StatefulWidget {
 }
 
 class _CommentsState extends State<Comments> {
+
   final TextEditingController commentController = TextEditingController();
   final TextEditingController aliasController = TextEditingController();
 
   var formKey = GlobalKey<FormState>();
-
   File? file;
   ImagePicker image = ImagePicker();
 
@@ -93,6 +93,7 @@ class _CommentsState extends State<Comments> {
   @override
   void initState() {
     getPost();
+    getComments(widget.data);
     super.initState();
   }
 
@@ -102,11 +103,9 @@ class _CommentsState extends State<Comments> {
 
     setState( () {
       post = convert.jsonDecode(response.body) as List<dynamic>;
-    }
+      }
     );
   }
-
-
 
   getComments(int data) async {
     var url = 'https://63cb9d8cea85515415128b2b.mockapi.io/api/comments';
