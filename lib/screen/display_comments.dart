@@ -54,7 +54,7 @@ class _DisplayCommentsState extends State<DisplayComments> {
                   trailing: Text(
                     "${postComment[index]['createdAt']}",
                     style: const TextStyle(
-                      fontWeight: FontWeight.w300,
+                      fontWeigt: FontWeight.w300,
                       fontSize: 11,
                     ),
                   ),
